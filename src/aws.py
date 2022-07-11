@@ -17,13 +17,20 @@ class AWSClient:
                 print(exc)
                 return
 
-        self.config = config_dict  # Pass config_dict to local storage config
+        # Pass config_dict to local storage config
+        self.config = config_dict
         # User Dependent Values
         # AWS Access Key ID and Secret Access Key
         self.AWS_ACC_KEY = access_keys['AWS_ACC_KEY']
         self.AWS_SEC_KEY = access_keys['AWS_SEC_KEY']
 
-    def init_client_config(self, functionality) -> None:
+        # Session to store config states 
+        # Allows us to create service clients and resources
+        self.session = boto3.Session(
+                aws_access_key_id=self.AWS_ACC_KEY,
+                aws_secret_access_key=self.AWS_SEC_KEY)
+
+    def init_client_config(self) -> None:
         """
         Initialize our AWS client using config file
         Depending on functionality (from config), init client differently
@@ -31,15 +38,16 @@ class AWSClient:
         # AWS Configuration settings - via YAML file
         # Universal Settings 
         self.AWS_REGION = self.config['AWS_REGION']
+        self.functionality = self.config['FUNCTIONALITY']
 
-        if 'IAM' in functionality:
+        if 'IAM' in self.functionality:
             # IAM Settings
             self.IAM_USER_NAME = self.config['IAM_USER_NAME']
             self.IAM_USER_TAGS = self.config['IAM_USER_TAGS']
             self.IAM_USER_TAGS_VALUE = self.config['IAM_USER_TAGS_VALUE']
             self.IAM_USER_TAGS_KEY = self.config['IAM_USER_TAGS_KEY']
             
-        if 'EC2' in functionality:
+        if 'EC2' in self.functionality:
             # EC2 Settings
             self.EC2_INSTANCE_TYPE = self.config['EC2_INSTANCE_TYPE']
             self.EC2_AMI_ID = self.config['EC2_AMI_ID']
@@ -52,14 +60,14 @@ class AWSClient:
             self.EC2_INSTANCE_TAGS_VALUE = self.config['EC2_INSTANCE_TAGS_VALUE']
             self.EC2_INSTANCE_TAGS_KEY = self.config['EC2_INSTANCE_TAGS_KEY']
         
-        if 'S3' in functionality:
+        if 'S3' in self.functionality:
             # S3 Settings
             self.S3_BUCKET_NAME = self.config['S3_BUCKET_NAME']
             self.S3_BUCKET_TAGS = self.config['S3_BUCKET_TAGS']
             self.S3_BUCKET_TAGS_VALUE = self.config['S3_BUCKET_TAGS_VALUE']
             self.S3_BUCKET_TAGS_KEY = self.config['S3_BUCKET_TAGS_KEY']
 
-        if 'CW' in functionality:
+        if 'CW' in self.functionality:
             # CloudWatch Settings
             self.CW_ALARM_NAME = self.config['CW_ALARM_NAME']
             self.CW_ALARM_DESCRIPTION = self.config['CW_ALARM_DESCRIPTION']
@@ -67,7 +75,7 @@ class AWSClient:
             self.CW_ALARM_NAMESPACE = self.config['CW_ALARM_NAMESPACE']
             self.CW_ALARM_STATISTIC = self.config['CW_ALARM_STATISTIC']
         
-        if 'AS' in functionality:
+        if 'AS' in self.functionality:
             # AutoScaling Settings
             self.WORKER_MINIMUM = self.config['WORKER_MINIMUM']
             self.WORKER_MAXIMUM = self.config['WORKER_MAXIMUM']
