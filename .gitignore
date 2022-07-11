@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# AWS Access Keys
+.aws/credentials
+.aws/config
+/keys
+
